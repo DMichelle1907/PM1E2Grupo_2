@@ -33,18 +33,17 @@
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="303dp">
 
-        <Button
-            android:id="@+id/btnEditFirma"
+        <TextView
+            android:id="@+id/GuardarFirma"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="90dp"
             android:layout_marginEnd="90dp"
-            android:backgroundTint="#00ACC1"
             android:text="Firma digital"
-            android:textSize="18dp"
-            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textSize="24dp"
+            android:textStyle="bold" />
 
-            />
 
         <TextView
             android:id="@+id/textView1"
