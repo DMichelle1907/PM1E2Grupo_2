@@ -7,8 +7,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.examenpmi.config.LaunchActivityMapa;
 import com.example.examenpmi.config.ListAdapter;
 import com.example.examenpmi.config.Firmas;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ActivityListaContactos extends AppCompatActivity {
-
+    LaunchActivityMapa abrirMapa;
     ListView listView;
     List<Firmas> Firmas = new ArrayList<>();
     ListAdapter mAdapter;
@@ -45,6 +47,21 @@ public class ActivityListaContactos extends AppCompatActivity {
         obtenerTabla();
         mAdapter = new ListAdapter(this,Firmas);
         listView.setAdapter(mAdapter);
+
+        //En este segmento se crea el prompt para ir a la Latitud/Longitud
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int posicion, long id) {
+                Firmas contactoSeleccionado = Firmas.get(posicion);
+
+                int latitud = contactoSeleccionado.getLatitud();
+                int longitud = contactoSeleccionado.getLongitud();
+
+                LaunchActivityMapa abrirMapa = new LaunchActivityMapa();
+
+                abrirMapa.launchMapActivity(ActivityListaContactos.this, latitud, longitud);
+            }
+        });
 
     }
 
