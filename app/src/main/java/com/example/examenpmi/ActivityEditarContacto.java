@@ -1,9 +1,13 @@
 package com.example.examenpmi;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.examenpmi.databinding.ActivityEditarContactoBinding;
 import com.example.examenpmi.databinding.ActivityMainBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -19,26 +24,33 @@ import java.io.ByteArrayOutputStream;
 
 public class ActivityEditarContacto extends AppCompatActivity {
     private DataBaseHelper dbHelper;
+    ActivityEditarContactoBinding mainBinding;
     EditText edtNombreEdit, edtTelefonoEdit, edtLongitudEdit, edtLatitudedit;
-    Button btnActualizar, btnEliminar;
-    ActivityMainBinding mainBinding;
+    Button btnActualir, btnvolver;
+    private String key_id,nombre;
+    private Context context;
+    //ActivityEditarContactoBinding mainBinding;
+    DataBaseHelper conexion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editar_contacto);
+        mainBinding = ActivityEditarContactoBinding.inflate(getLayoutInflater());
+        setContentView(mainBinding.getRoot());
+       // setContentView(R.layout.activity_editar_contacto);
         edtNombreEdit = findViewById(R.id.edtNombreEdit);
         edtTelefonoEdit = findViewById(R.id.edtTelefonoEdit);
         edtLongitudEdit = findViewById(R.id.edtLongitudEdit);
         edtLatitudedit = findViewById(R.id.edtLatitudedit);
-        btnActualizar = findViewById(R.id.btnActualizar);
-        btnEliminar = findViewById(R.id.btnEliminar);
+        //btnActualizar = findViewById(R.id.btnActualizar);
+         btnvolver = findViewById(R.id.btnvolver);
 
         Intent intent = getIntent();
 
         // Recupera el valor utilizando la clave que usaste en Activity1
-        String id = intent.getStringExtra("MENSAJE_KEY");
-        String nombre = intent.getStringExtra("MENSAJE__KEY");
+
+        key_id = intent.getStringExtra("MENSAJE_KEY");
+        nombre = intent.getStringExtra("MENSAJE__KEY");
         String telefono = intent.getStringExtra("MENSAJE___KEY");
         String longitud = intent.getStringExtra("MENSAJE____KEY");
         String latitud = intent.getStringExtra("MENSAJE_____KEY");
@@ -57,40 +69,44 @@ public class ActivityEditarContacto extends AppCompatActivity {
         edtLatitudedit.setText(latitud);
 
 
-        btnActualizar.setOnClickListener(view -> {
-            Bitmap signBitmap = mainBinding.signatureView.getSignatureBitmap();
-            if (signBitmap != null) {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                signBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                // Aquí debes insertar el byte array en la base de datos utilizando SQLiteOpenHelper o algún otro método de acceso a la base de datos
-                // Por ejemplo:
+        dbHelper = new DataBaseHelper(this);
 
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                values.put("signature", byteArray);
-                values.put("nombre", edtNombreEdit.getText().toString());
-                values.put("telefono", edtTelefonoEdit.getText().toString());
-                values.put("longitud", edtLongitudEdit.getText().toString());
-                values.put("latitud", edtLatitudedit.getText().toString());
-                String whereClause = "telefono = ?";
-                String[] whereArgs = {edtTelefonoEdit.getText().toString()};
+        mainBinding.btnActualizar.setOnClickListener(view -> {
 
-                long result = db.update(DataBaseHelper.tableName, values, whereClause, whereArgs);
+                Bitmap signBitmap = mainBinding.signatureViewEdit.getSignatureBitmap();
+                if (signBitmap != null) {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    signBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
 
-                if (result != -1) {
-                    Toast.makeText(ActivityEditarContacto.this, "Firma guardada correctamente", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ActivityEditarContacto.this, "Error al guardar la firma", Toast.LENGTH_SHORT).show();
+                    if(nombre.isEmpty() || telefono.isEmpty() || latitud.isEmpty() || longitud.isEmpty() || signBitmap == null){
+                        Toast.makeText(ActivityEditarContacto.this, " Todos los campos deben estar llenos", Toast.LENGTH_SHORT).show();
+                    }else {
+
+                    // Agrega el mensaje de bienvenida
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    values.put("signature", byteArray);
+                    values.put("nombre", edtNombreEdit.getText().toString());
+                    values.put("telefono", edtTelefonoEdit.getText().toString());
+                    values.put("longitud", edtLongitudEdit.getText().toString());
+                    values.put("latitud", edtLatitudedit.getText().toString());
+                    int update = db.update(DataBaseHelper.tableName, values, "nombre = ?", new String[]{String.valueOf(nombre)});
+                    if (update != -1) {
+                        Toast.makeText(ActivityEditarContacto.this, "Actualizado correctamente", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ActivityEditarContacto.this, "Error al actualizar ", Toast.LENGTH_SHORT).show();
+
+                    }
                 }
             }
-
         });
 
-        btnActualizar.setOnClickListener(new View.OnClickListener() {
+        btnvolver.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
+            public void onClick(View view) {
+                Intent intent = new Intent(ActivityEditarContacto.this, ActivityListaContactos.class);
+                startActivity(intent);
             }
         });
     }

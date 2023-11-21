@@ -49,26 +49,29 @@ public class MainActivity extends AppCompatActivity {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 signBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
-                // Aquí debes insertar el byte array en la base de datos utilizando SQLiteOpenHelper o algún otro método de acceso a la base de datos
-                // Por ejemplo:
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                values.put("signature", byteArray);
-                values.put("nombre", edtNombre.getText().toString());
-                values.put("telefono", edtTelefono.getText().toString());
-                values.put("longitud", edtLongitud.getText().toString());
-                values.put("latitud", edtLatitud.getText().toString());
-                long result = db.insert(DataBaseHelper.tableName, null, values);
 
-                if (result != -1) {
-                    Toast.makeText(MainActivity.this, "Firma guardada correctamente", Toast.LENGTH_SHORT).show();
+                if (edtNombre.getText().toString().isEmpty() || edtTelefono.getText().toString().isEmpty() || edtLongitud.getText().toString().isEmpty() || edtLatitud.getText().toString().isEmpty() ) {
+                    Toast.makeText(MainActivity.this, " Todos los campos deben estar llenos " , Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Error al guardar la firma", Toast.LENGTH_SHORT).show();
+                    // Aquí debes insertar el byte array en la base de datos utilizando SQLiteOpenHelper o algún otro método de acceso a la base de datos
+                    // Por ejemplo:
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    values.put("signature", byteArray);
+                    values.put("nombre", edtNombre.getText().toString());
+                    values.put("telefono", edtTelefono.getText().toString());
+                    values.put("longitud", edtLongitud.getText().toString());
+                    values.put("latitud", edtLatitud.getText().toString());
+                    long result = db.insert(DataBaseHelper.tableName, null, values);
+
+                    if (result != -1) {
+                        Toast.makeText(MainActivity.this, "Firma guardada correctamente", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error al guardar la firma", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
-
         });
-
 
 
         btnSalvados.setOnClickListener(new View.OnClickListener() {

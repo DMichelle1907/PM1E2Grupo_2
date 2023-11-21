@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,8 +33,8 @@ public class ActivityListaContactos extends AppCompatActivity {
     ListAdapter mAdapter;
     DataBaseHelper conexion;
     FloatingActionButton btnRegresar;
-    int id;
-    String nombre,Contacto,longitud,latitud;
+    private int id1;
+    String nombre, Contacto, longitud, latitud;
     Button btnActualizar, btnEliminar;
     private int selectedItemPosition = -1;
 
@@ -57,7 +58,7 @@ public class ActivityListaContactos extends AppCompatActivity {
         btnActualizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id1 = id;
+
                 String nombre1 = nombre;
                 String contacto1 = Contacto;
                 String longitud1 = longitud;
@@ -67,11 +68,11 @@ public class ActivityListaContactos extends AppCompatActivity {
                 // Crea un Intent
                 Intent intent = new Intent(ActivityListaContactos.this, ActivityEditarContacto.class);
                 // Añade el valor al Intent con una clave
-                intent.putExtra("MENSAJE_KEY", id);
+                intent.putExtra("MENSAJE_KEY", id1);
                 intent.putExtra("MENSAJE__KEY", nombre1);
                 intent.putExtra("MENSAJE___KEY", contacto1);
                 intent.putExtra("MENSAJE____KEY", longitud1);
-                intent.putExtra("MENSAJE_____KEY", latitud);
+                intent.putExtra("MENSAJE_____KEY", latitud1);
 
 
                 // Inicia la segunda actividad
@@ -87,17 +88,19 @@ public class ActivityListaContactos extends AppCompatActivity {
 
 
                 if (result > 0) {
-                    Toast.makeText(ActivityListaContactos.this, "Contacto seleccionado correctamente "+nombre + Contacto, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityListaContactos.this, "Contacto seleccionado correctamente " + nombre + Contacto, Toast.LENGTH_SHORT).show();
                     // Puedes realizar acciones adicionales después de eliminar todos los contactos si es necesario
+                    recreate();
                 } else {
                     Toast.makeText(ActivityListaContactos.this, "Error al eliminar el contacto", Toast.LENGTH_SHORT).show();
+                    recreate();
                 }
             }
         });
 
         listView = (ListView) findViewById(R.id.listView);
         obtenerTabla();
-        mAdapter = new ListAdapter(this,Firmas);
+        mAdapter = new ListAdapter(this, Firmas);
         listView.setAdapter(mAdapter);
 
         //En este segmento se crea el prompt para ir a la Latitud/Longitud
@@ -112,18 +115,20 @@ public class ActivityListaContactos extends AppCompatActivity {
                     LaunchActivityMapa abrirMapa = new LaunchActivityMapa();
 
                     abrirMapa.launchMapActivity(ActivityListaContactos.this, latitud, longitud);
-                    Toast.makeText(ActivityListaContactos.this, "Elemento eliminado", Toast.LENGTH_SHORT).show();
+
+
                     // Reiniciar la posición seleccionada
                     selectedItemPosition = -1;
                 } else {
-                    id = Integer.valueOf(contactoSeleccionado.getId());
+                    id1 = Integer.valueOf(contactoSeleccionado.getId());
+                    Log.d("ID_DEBUG", "ID value: " + id1);
                     nombre = String.valueOf(contactoSeleccionado.getNombre());
                     Contacto = String.valueOf(contactoSeleccionado.getTelefono());
-                   longitud = String.valueOf(contactoSeleccionado.getLongitud());
-                   latitud = String.valueOf(contactoSeleccionado.getLatitud());
+                    longitud = String.valueOf(contactoSeleccionado.getLongitud());
+                    latitud = String.valueOf(contactoSeleccionado.getLatitud());
                     // Primer toque, actualizar la posición seleccionada
                     selectedItemPosition = posicion;
-                    Toast.makeText(ActivityListaContactos.this, "Toque nuevamente para eliminar", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityListaContactos.this, "Contacto seleccionado correctamente " + nombre + Contacto, Toast.LENGTH_SHORT).show();
                     // Reiniciar la posición seleccionada
                     selectedItemPosition = -1;
                 }
@@ -138,10 +143,10 @@ public class ActivityListaContactos extends AppCompatActivity {
         SQLiteDatabase db = conexion.getReadableDatabase();
         Firmas firmas = null;
         //Cursor de base de datos
-        Cursor cursor = db.rawQuery(DataBaseHelper.SelectTable,null);
+        Cursor cursor = db.rawQuery(DataBaseHelper.SelectTable, null);
 
         //Recorremos el cursor
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             firmas = new Firmas();
             firmas.setId(cursor.getString(0));
             firmas.setNombre(cursor.getString(2));
