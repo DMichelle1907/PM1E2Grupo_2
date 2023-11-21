@@ -36,6 +36,10 @@
               android:name="com.google.android.geo.API_KEY"
               android:value="AIzaSyCUU-mgylpTeY4HKEmjesvw9aDTWUcv76I" />
           <activity
+              android:name=".ActivityEditarContacto"
+              android:exported="false"
+              />
+          <activity
               android:name=".ActivityMapa"
               android:exported="false"
                />
