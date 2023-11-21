@@ -18,6 +18,7 @@ public class Firmas {
     public Firmas() {
     }
 
+
     public byte[] getSignature() {
         return signature;
     }
@@ -65,4 +66,5 @@ public class Firmas {
     public void setLatitud(Integer latitud) {
         this.latitud = latitud;
     }
+
 }
