@@ -18,7 +18,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Define la sentencia SQL para crear la tabla
-        String createTableQuery = "CREATE TABLE firmas(id INTEGER PRIMARY KEY AUTOINCREMENT, signature BLOB, nombre TEXT, telefono INTEGER, longitud INTEGER, latitud INTEGER)";
+        String createTableQuery = "CREATE TABLE firmas(id INTEGER PRIMARY KEY AUTOINCREMENT, signature BLOB, nombre TEXT, telefono INTEGER, longitud FLOAT, latitud FLOAT)";
 
         // Ejecuta la sentencia SQL para crear la tabla
         db.execSQL(createTableQuery);

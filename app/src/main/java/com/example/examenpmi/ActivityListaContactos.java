@@ -1,13 +1,16 @@
 package com.example.examenpmi;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -37,14 +40,16 @@ public class ActivityListaContactos extends AppCompatActivity {
     String nombre, Contacto, longitud, latitud;
     Button btnActualizar, btnEliminar;
     private int selectedItemPosition = -1;
+    private static final long DOUBLE_CLICK_TIME_THRESHOLD = 1000; // En milisegundos
 
+    private long lastClickTime;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registros);
-
+        lastClickTime = SystemClock.elapsedRealtime();
         conexion = new DataBaseHelper(this);
         btnActualizar = findViewById(R.id.btnActualizarContacto);
         btnRegresar = findViewById(R.id.btnRegresar);
@@ -107,19 +112,10 @@ public class ActivityListaContactos extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int posicion, long id) {
+
                 Firmas contactoSeleccionado = Firmas.get(posicion);
-                if (posicion == selectedItemPosition) {
-                    int latitud = contactoSeleccionado.getLatitud();
-                    int longitud = contactoSeleccionado.getLongitud();
+                if (selectedItemPosition == -1) {
 
-                    LaunchActivityMapa abrirMapa = new LaunchActivityMapa();
-
-                    abrirMapa.launchMapActivity(ActivityListaContactos.this, latitud, longitud);
-
-
-                    // Reiniciar la posición seleccionada
-                    selectedItemPosition = -1;
-                } else {
                     id1 = Integer.valueOf(contactoSeleccionado.getId());
                     Log.d("ID_DEBUG", "ID value: " + id1);
                     nombre = String.valueOf(contactoSeleccionado.getNombre());
@@ -130,7 +126,41 @@ public class ActivityListaContactos extends AppCompatActivity {
                     selectedItemPosition = posicion;
                     Toast.makeText(ActivityListaContactos.this, "Contacto seleccionado correctamente " + nombre + Contacto, Toast.LENGTH_SHORT).show();
                     // Reiniciar la posición seleccionada
-                    selectedItemPosition = -1;
+
+
+                } else if (selectedItemPosition == posicion) {
+                    int latitud = contactoSeleccionado.getLatitud();
+                    int longitud = contactoSeleccionado.getLongitud();
+                    String nomnbre = contactoSeleccionado.getNombre();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ActivityListaContactos.this);
+                    builder.setTitle("Acción");
+                    builder.setMessage("¿Deseas ir a la ubicacion de " + nomnbre + "?");
+
+                    builder.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Intent intent = new Intent(MainActivity.this, ActivityCall.class);
+                            LaunchActivityMapa abrirMapa = new LaunchActivityMapa();
+
+                            abrirMapa.launchMapActivity(ActivityListaContactos.this, latitud, longitud);
+                        }
+                    });
+
+                    // Agregar botón "No"
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Acciones a realizar cuando se hace clic en "No"
+                            dialog.dismiss(); // Cerrar el diálogo
+                        }
+                    });
+                    // Mostrar el diálogo
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+
+
                 }
 
             }
